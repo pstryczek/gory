@@ -1,6 +1,4 @@
 import requests, json, urllib, websocket
-from bs4 import BeautifulSoup
-from selenium import webdriver
 
 try:
     import thread
@@ -18,7 +16,18 @@ def on_error(ws, error):
     print(error)
 
 def on_close(ws):
+    print('### closed ###')
+
+def on_open(ws):
     ws.send('{"west":-180,"east":180,"north":-90,"south":90}')
+
+def temp():
+    req = urllib.request.urlopen("http://91.220.17.198/data/station/Zakopane")
+    x = json.loads(req.read())
+    print("Temperatura " + str(x['data']['forecast'][0]['date']) + " : " + str(x['data']['forecast'][0]['t']) + " st. C")
+    print("Temperatura obecna: " + str(x['data']['measurements']['t']['value']) + " st. C")
+
+
 
 if __name__=="__main__":
     websocket.enableTrace(True)
@@ -28,16 +37,10 @@ if __name__=="__main__":
                                 on_error = on_error,
                                 on_close = on_close,
                                 on_open = on_open)
+    temp()
     ws.run_forever()
 
-driver = webdriver.Chrome()
-temp=[]
-driver.get("http://91.220.17.198/Zakopane/1")
-content = driver.page_source
-soup = BeautifulSoup(content,features="html.parser")
-for a in soup.findAll('a', href=True, attrs={'class':'col-xs-6 set text-left'}):
-    dzistemp = a.find('div', attrs={'class':'col-xs-12 temp'})
-    print(temp.a.append(dzistemp.text))
+
 
 '''
 odpowiedz = urllib.request.urlopen("http://91.220.17.198/data/region/Zakopane")
@@ -47,4 +50,6 @@ y = json.loads(odpowiedz.read())
 for x in y['data']['stations']:
     print(y["data"]["stations"][x]["name"])
     print(y["data"]["stations"][x]["position"])
+
 '''
+
